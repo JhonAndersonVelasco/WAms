@@ -1,0 +1,17 @@
+.
+├── estructura.txt
+├── main.py
+├── PKGBUILD
+├── README.md
+├── src
+│   ├── get_theme.py
+│   ├── i18n.py
+│   ├── notification.py
+│   ├── translations
+│   │   ├── en.json
+│   │   └── es.json
+│   ├── wams.png
+│   └── web.py
+└── wams.desktop
+
+4 directories, 16 files

@@ -8,7 +8,8 @@ import webbrowser
 from PyQt6.QtCore import Qt, QUrl, QSettings, QLocale, pyqtSignal, QTimer
 from PyQt6.QtGui import QIcon, QImage, QPainter, QBrush, QPen, QAction, QDesktopServices
 from PyQt6.QtWidgets import (QMainWindow, QApplication, QFileDialog, QSystemTrayIcon, QMenu,
-                             QTabWidget, QPushButton, QMessageBox, QLineEdit, QTabBar, QWidget, QHBoxLayout)
+                             QTabWidget, QPushButton, QMessageBox, QLineEdit, QTabBar, QWidget,
+                             QHBoxLayout)
 from PyQt6.QtWebEngineCore import QWebEngineDownloadRequest, QWebEngineProfile, QWebEngineSettings
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 
