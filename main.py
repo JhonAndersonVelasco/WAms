@@ -7,13 +7,12 @@ import webbrowser
 
 from PyQt6.QtCore import Qt, QUrl, QSettings, QLocale, pyqtSignal, QTimer
 from PyQt6.QtGui import QIcon, QImage, QPainter, QBrush, QPen, QAction
-from PyQt6.QtWidgets import (
-    QMainWindow, QApplication, QFileDialog, QSystemTrayIcon, QMenu,
-    QTabWidget, QPushButton, QMessageBox, QLineEdit, QTabBar, QWidget, QHBoxLayout
-)
+from PyQt6.QtWidgets import (QMainWindow, QApplication, QFileDialog, QSystemTrayIcon, QMenu,
+                             QTabWidget, QPushButton, QMessageBox, QLineEdit, QTabBar, QWidget, QHBoxLayout)
 from PyQt6.QtWebEngineCore import QWebEngineDownloadRequest
 from PyQt6.QtWebEngineCore import QWebEngineProfile, QWebEngineSettings
 from PyQt6.QtWebEngineWidgets import QWebEngineView
+
 import src.notification as Notification
 from src.i18n import tr
 import src.web as web
@@ -52,7 +51,7 @@ class RenameTabBar(QTabBar):
 class MainWindow(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
-        self.setWindowIcon(QIcon("wams.png"))
+        self.setWindowIcon(QIcon("src/wams.png"))
 
         self.setup_system_locale()
         self.setup_app_directory()
@@ -441,8 +440,8 @@ class MainWindow(QMainWindow):
             print("System tray is not available.")
             return
         self.tray_icon = QSystemTrayIcon(self)
-        if os.path.exists("wams.png"):
-            self.tray_icon.setIcon(QIcon("wams.png"))
+        if os.path.exists("src/wams.png"):
+            self.tray_icon.setIcon(QIcon("src/wams.png"))
         else:
             self.tray_icon.setIcon(self.style().standardIcon(self.style().StandardPixmap.SP_ComputerIcon))
         self.tray_icon.setToolTip(tr("WhatsApp MultiSession"))
