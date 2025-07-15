@@ -16,6 +16,7 @@ from PyQt6.QtWebEngineCore import QWebEngineProfile, QWebEngineSettings
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 import src.notification as Notification
 from src.i18n import tr
+import src.web as web
 
 class RenameTabBar(QTabBar):
     tabNameChanged = pyqtSignal(int, str)
