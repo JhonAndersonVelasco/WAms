@@ -6,11 +6,10 @@ import time
 import webbrowser
 
 from PyQt6.QtCore import Qt, QUrl, QSettings, QLocale, pyqtSignal, QTimer
-from PyQt6.QtGui import QIcon, QImage, QPainter, QBrush, QPen, QAction
+from PyQt6.QtGui import QIcon, QImage, QPainter, QBrush, QPen, QAction, QDesktopServices
 from PyQt6.QtWidgets import (QMainWindow, QApplication, QFileDialog, QSystemTrayIcon, QMenu,
                              QTabWidget, QPushButton, QMessageBox, QLineEdit, QTabBar, QWidget, QHBoxLayout)
-from PyQt6.QtWebEngineCore import QWebEngineDownloadRequest
-from PyQt6.QtWebEngineCore import QWebEngineProfile, QWebEngineSettings
+from PyQt6.QtWebEngineCore import QWebEngineDownloadRequest, QWebEngineProfile, QWebEngineSettings
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 
 import src.notification as Notification
@@ -612,5 +611,12 @@ if __name__ == "__main__":
 
     window = MainWindow()
     window.setWindowTitle("WhatsApp MultiSession")
+
+    if len(sys.argv) > 1:
+        link = sys.argv[1]
+        if link.startswith("whatsapp://"):
+            QDesktopServices.openUrl(QUrl(link.replace("whatsapp://", "https://wa.me/")))
+    else:
+        window.show()
 
     sys.exit(app.exec())
