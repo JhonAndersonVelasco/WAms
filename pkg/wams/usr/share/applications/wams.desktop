@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=WhatsApp MultiSession
+Exec=wams
+Icon=wams
+Terminal=false
+Type=Application
+Categories=Network;Chat;
+MimeType=x-scheme-handler/whatsapp;
+StartupNotify=true
