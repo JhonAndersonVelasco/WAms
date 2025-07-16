@@ -8,7 +8,7 @@ from PyQt6.QtGui import QDesktopServices
 from PyQt6.QtWebEngineCore import QWebEnginePage
 from PyQt6.QtWidgets import QApplication
 
-import wams.get_theme as get_theme
+import modules.get_theme as get_theme
 
 class WhatsApp(QWebEnginePage):
 

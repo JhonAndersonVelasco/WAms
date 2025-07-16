@@ -13,9 +13,9 @@ from PyQt6.QtWidgets import (QMainWindow, QApplication, QFileDialog, QSystemTray
 from PyQt6.QtWebEngineCore import QWebEngineDownloadRequest, QWebEngineProfile, QWebEngineSettings
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 
-import wams.notification as Notification
-from wams.i18n import tr
-import wams.web as web
+import modules.notification as Notification
+from modules.i18n import tr
+import modules.web as web
 
 class RenameTabBar(QTabBar):
     tabNameChanged = pyqtSignal(int, str)
@@ -51,7 +51,7 @@ class RenameTabBar(QTabBar):
 class MainWindow(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
-        self.setWindowIcon(QIcon("src/wams/wams.png"))
+        self.setWindowIcon(QIcon("main/modules/wams.png"))
 
         self.setup_system_locale()
         self.setup_app_directory()
@@ -442,8 +442,8 @@ class MainWindow(QMainWindow):
             print("System tray is not available.")
             return
         self.tray_icon = QSystemTrayIcon(self)
-        if os.path.exists("src/wams/wams.png"):
-            self.tray_icon.setIcon(QIcon("src/wams/wams.png"))
+        if os.path.exists("main/modules/wams.png"):
+            self.tray_icon.setIcon(QIcon("main/modules/wams.png"))
         else:
             self.tray_icon.setIcon(self.style().standardIcon(self.style().StandardPixmap.SP_ComputerIcon))
         self.tray_icon.setToolTip(tr("WhatsApp MultiSession"))

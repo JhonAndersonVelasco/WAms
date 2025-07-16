@@ -1,16 +1,18 @@
-WAms
-├── main.py
-├── PKGBUILD
-├── README.md
-├── src
-│   ├── get_theme.py
-│   ├── i18n.py
-│   ├── notification.py
-│   ├── translations
-│   │   ├── en.json
-│   │   └── es.json
-│   ├── wams.png
-│   └── web.py
-└── wams.desktop
+.
+├── main
+│   ├── __init__.py
+│   ├── main.py
+│   ├── modules
+│   │   ├── get_theme.py
+│   │   ├── i18n.py
+│   │   ├── notification.py
+│   │   ├── translations
+│   │   │   ├── en.json
+│   │   │   └── es.json
+│   │   ├── wams.png
+│   │   └── web.py
+│   ├── README.md
+│   └── wams.desktop
+└── PKGBUILD
 
-4 directories, 16 files
+4 directories, 13 files
