@@ -1,3 +1,4 @@
+import os
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtCore import QUrl, QLocale
 from PyQt6.QtWebEngineCore import QWebEnginePage
@@ -6,8 +7,8 @@ from PyQt6.QtCore import QEvent, Qt, QUrl, QSettings
 from PyQt6.QtGui import QDesktopServices
 from PyQt6.QtWebEngineCore import QWebEnginePage
 from PyQt6.QtWidgets import QApplication
-import os
-import src.get_theme as get_theme
+
+import wams.get_theme as get_theme
 
 class WhatsApp(QWebEnginePage):
 

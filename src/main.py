@@ -13,9 +13,9 @@ from PyQt6.QtWidgets import (QMainWindow, QApplication, QFileDialog, QSystemTray
 from PyQt6.QtWebEngineCore import QWebEngineDownloadRequest, QWebEngineProfile, QWebEngineSettings
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 
-import src.notification as Notification
-from src.i18n import tr
-import src.web as web
+import wams.notification as Notification
+from wams.i18n import tr
+import wams.web as web
 
 class RenameTabBar(QTabBar):
     tabNameChanged = pyqtSignal(int, str)
@@ -51,12 +51,14 @@ class RenameTabBar(QTabBar):
 class MainWindow(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
-        self.setWindowIcon(QIcon("src/wams.png"))
+        self.setWindowIcon(QIcon("src/wams/wams.png"))
 
         self.setup_system_locale()
         self.setup_app_directory()
         self.settings = QSettings(os.path.join(self.app_dir, "config.ini"), QSettings.Format.IniFormat)
         self.setup_window_configuration()
+
+        self.force_quit = False
 
         Notification.init("WAms")
 
@@ -440,8 +442,8 @@ class MainWindow(QMainWindow):
             print("System tray is not available.")
             return
         self.tray_icon = QSystemTrayIcon(self)
-        if os.path.exists("src/wams.png"):
-            self.tray_icon.setIcon(QIcon("src/wams.png"))
+        if os.path.exists("src/wams/wams.png"):
+            self.tray_icon.setIcon(QIcon("src/wams/wams.png"))
         else:
             self.tray_icon.setIcon(self.style().standardIcon(self.style().StandardPixmap.SP_ComputerIcon))
         self.tray_icon.setToolTip(tr("WhatsApp MultiSession"))
@@ -483,6 +485,7 @@ class MainWindow(QMainWindow):
                 self.first_minimize_shown = True
 
     def quit_application(self):
+        self.force_quit = True
         # Close all tabs properly before quitting
         while self.tabs.count() > 0:
             current_webview = self.tabs.widget(0)
@@ -492,9 +495,9 @@ class MainWindow(QMainWindow):
             if current_webview:
                 current_webview.deleteLater()
 
-        self.save_window_settings()
         if hasattr(self, 'tray_icon'):
             self.tray_icon.hide()
+        self.save_window_settings()
         QApplication.instance().quit()
 
     def save_window_settings(self):
@@ -585,6 +588,11 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event):
         """On close, either minimize to tray or save settings and exit."""
+
+        if self.force_quit:
+            event.accept()
+            return
+
         if self.settings.value("general/minimize_on_close", True, bool) and hasattr(self, 'tray_icon') and QSystemTrayIcon.isSystemTrayAvailable():
             event.ignore()
             self.minimize_to_tray()

@@ -1,6 +1,6 @@
 import dbus
 from collections import OrderedDict
-from src.i18n import tr
+from wams.i18n import tr
 
 DBusGMainLoop = None
 try:

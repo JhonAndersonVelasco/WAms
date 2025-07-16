@@ -1,5 +1,4 @@
-.
-├── estructura.txt
+WAms
 ├── main.py
 ├── PKGBUILD
 ├── README.md

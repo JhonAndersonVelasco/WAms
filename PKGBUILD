@@ -5,18 +5,18 @@ pkgdesc="WhatsApp MultiSession: múltiples sesiones independientes de WhatsApp W
 arch=('any')
 url="https://github.com/jhandervelbux/wams"
 license=('GPL3')
-depends=('python' 'python-pyqt6' 'python-pyqt6-webengine' 'python-dbus' 'python-dbus.mainloop.glib')
+depends=('python' 'python-pyqt6' 'python-pyqt6-webengine' 'python-dbus')
 makedepends=('python-setuptools')
-source=('main.py'
-        'src/get_theme.py'
-        'src/i18n.py'
-        'src/notification.py'
-        'src/web.py'
-        'src/wams.png'
-        'src/translations/en.json'
-        'src/translations/es.json'
-        'wams.desktop'
-        'README.md')
+source=('src/main.py'
+        'src/wams/get_theme.py'
+        'src/wams/i18n.py'
+        'src/wams/notification.py'
+        'src/wams/web.py'
+        'src/wams/wams.png'
+        'src/wams/translations/en.json'
+        'src/wams/translations/es.json'
+        'src/wams.desktop'
+        'src/README.md')
 md5sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
 
 package() {
