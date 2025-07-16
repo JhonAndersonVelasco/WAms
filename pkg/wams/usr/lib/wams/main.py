@@ -17,6 +17,22 @@ import modules.notification as Notification
 from modules.i18n import tr
 import modules.web as web
 
+def get_app_icon():
+    """Obtiene el icono de la aplicación desde diferentes ubicaciones"""
+    icon_paths = [
+        '/usr/lib/wams/modules/wams.png',  # Instalación del paquete
+        '/usr/share/icons/hicolor/256x256/apps/wams.png',  # Iconos del sistema
+        'main/modules/wams.png',          # Para desarrollo local
+        'modules/wams.png'                # Para desarrollo local alternativo
+    ]
+
+    for path in icon_paths:
+        if os.path.exists(path):
+            return QIcon(path)
+
+    # Fallback al icono del tema del sistema
+    return QIcon.fromTheme('wams', QIcon.fromTheme('application-x-executable'))
+
 class RenameTabBar(QTabBar):
     tabNameChanged = pyqtSignal(int, str)
 
@@ -51,7 +67,8 @@ class RenameTabBar(QTabBar):
 class MainWindow(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
-        self.setWindowIcon(QIcon("main/modules/wams.png"))
+        self.app_icon = get_app_icon()
+        self.setWindowIcon(self.app_icon)
 
         self.setup_system_locale()
         self.setup_app_directory()
@@ -442,10 +459,7 @@ class MainWindow(QMainWindow):
             print("System tray is not available.")
             return
         self.tray_icon = QSystemTrayIcon(self)
-        if os.path.exists("main/modules/wams.png"):
-            self.tray_icon.setIcon(QIcon("main/modules/wams.png"))
-        else:
-            self.tray_icon.setIcon(self.style().standardIcon(self.style().StandardPixmap.SP_ComputerIcon))
+        self.tray_icon.setIcon(self.app_icon)
         self.tray_icon.setToolTip(tr("WhatsApp MultiSession"))
         self.create_tray_menu()
         self.tray_icon.activated.connect(self.on_tray_icon_activated)

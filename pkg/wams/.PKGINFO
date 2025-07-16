@@ -6,9 +6,9 @@ xdata = pkgtype=pkg
 pkgver = 0.1-1
 pkgdesc = WhatsApp MultiSession: múltiples sesiones de WhatsApp Web independientes
 url = https://github.com/jhandervelbux/wams
-builddate = 1752628163
+builddate = 1752630138
 packager = Unknown Packager
-size = 203344
+size = 203805
 arch = any
 license = GPL3
 depend = python
