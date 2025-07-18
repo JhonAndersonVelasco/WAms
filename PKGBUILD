@@ -46,5 +46,5 @@ EOF
   install -Dm644 "$startdir/main/wams.desktop" "$pkgdir/usr/share/applications/wams.desktop"
 
   # Instalar documentación
-  install -Dm644 "$startdir/main/README.md" "$pkgdir/usr/share/doc/wams/README.md"
+  install -Dm644 "$startdir/README.md" "$pkgdir/usr/share/doc/wams/README.md"
 }

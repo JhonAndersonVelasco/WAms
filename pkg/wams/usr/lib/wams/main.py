@@ -206,12 +206,88 @@ class MainWindow(QMainWindow):
         home_dir = os.path.expanduser("~")
         self.app_dir = os.path.join(home_dir, ".WAms")
         self.sessions_dir = os.path.join(self.app_dir, "sessions")
-        self.downloads_dir = os.path.join(self.app_dir, "downloads")
 
-        for directory in [self.app_dir, self.sessions_dir, self.downloads_dir]:
+        # Obtener la carpeta de descargas usando el estándar XDG
+        self.downloads_dir = self.get_downloads_directory()
+
+        # Solo crear los directorios de la aplicación, no el de descargas
+        for directory in [self.app_dir, self.sessions_dir]:
             if not os.path.exists(directory):
                 os.makedirs(directory)
                 print(f"Directory created: {directory}")
+
+        # Verificar que la carpeta de descargas existe
+        if not os.path.exists(self.downloads_dir):
+            os.makedirs(self.downloads_dir)
+            print(f"Downloads directory created: {self.downloads_dir}")
+        else:
+            print(f"Using Downloads directory: {self.downloads_dir}")
+
+    def get_downloads_directory(self):
+        """
+        Obtiene la carpeta de descargas del usuario usando el estándar XDG
+        y varios métodos de fallback para máxima compatibilidad
+        """
+        import subprocess
+
+        # Método 1: Usar xdg-user-dir (más confiable)
+        try:
+            result = subprocess.run(['xdg-user-dir', 'DOWNLOAD'],
+                                capture_output=True, text=True, check=True)
+            downloads_path = result.stdout.strip()
+            if downloads_path and os.path.exists(downloads_path):
+                print(f"Downloads directory found via xdg-user-dir: {downloads_path}")
+                return downloads_path
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            print("xdg-user-dir not available, trying alternative methods...")
+
+        # Método 2: Leer el archivo de configuración XDG directamente
+        home_dir = os.path.expanduser("~")
+        xdg_config_file = os.path.join(home_dir, ".config", "user-dirs.dirs")
+
+        if os.path.exists(xdg_config_file):
+            try:
+                with open(xdg_config_file, 'r') as f:
+                    for line in f:
+                        if line.startswith('XDG_DOWNLOAD_DIR='):
+                            # Extraer la ruta, removiendo comillas y expandiendo variables
+                            path = line.split('=', 1)[1].strip().strip('"\'')
+                            path = path.replace('$HOME', home_dir)
+                            if os.path.exists(path):
+                                print(f"Downloads directory found via XDG config: {path}")
+                                return path
+            except Exception as e:
+                print(f"Error reading XDG config file: {e}")
+
+        # Método 3: Variable de entorno XDG_DOWNLOAD_DIR
+        xdg_download = os.environ.get('XDG_DOWNLOAD_DIR')
+        if xdg_download and os.path.exists(xdg_download):
+            print(f"Downloads directory found via XDG_DOWNLOAD_DIR: {xdg_download}")
+            return xdg_download
+
+        # Método 4: Fallbacks comunes por idioma
+        common_download_names = [
+            'Downloads',    # Inglés
+            'Descargas',    # Español
+            'Téléchargements',  # Francés
+            'Download',     # Alemán
+            'Scaricati',    # Italiano
+            'Baixades',     # Catalán
+            'Preuzimanja',  # Serbio
+            'Λήψεις',       # Griego
+            'Загрузки',     # Ruso
+        ]
+
+        for name in common_download_names:
+            path = os.path.join(home_dir, name)
+            if os.path.exists(path):
+                print(f"Downloads directory found via fallback: {path}")
+                return path
+
+        # Método 5: Último recurso - crear WAms Downloads en inglés
+        fallback_path = os.path.join(home_dir, 'WAms')
+        print(f"Using fallback downloads directory: {fallback_path}")
+        return fallback_path
 
     def load_sessions_on_startup(self):
         """Scans the sessions directory and loads each one as a tab."""
@@ -526,7 +602,6 @@ class MainWindow(QMainWindow):
 
     def download(self, download):
         if download.state() == QWebEngineDownloadRequest.DownloadState.DownloadRequested:
-            current_webview = self.tabs.currentWidget()
             default_path = os.path.join(self.downloads_dir, download.downloadFileName())
 
             path, _ = QFileDialog.getSaveFileName(
