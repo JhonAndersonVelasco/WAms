@@ -39,7 +39,7 @@ The easiest way to install WAms on Arch Linux or Arch-based distributions (Manja
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/jhandervelbux/wams.git
+git clone https://github.com/JhonAndersonVelasco/WAms.git
 cd wams
 ```
 
