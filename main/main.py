@@ -8,7 +8,7 @@ if os.path.exists(os.path.join(app_path, 'modules')):
 else:
     sys.path.insert(0, os.path.join(app_path, '..'))
 
-from modules.system_setup import initialize_environment
+from modules.system_setup import initialize_environment 
 system_config = initialize_environment()
 
 # Ensure system locale is detected and set to UTF-8 before any GUI/WebEngine initialization
