@@ -8,7 +8,7 @@ if os.path.exists(os.path.join(app_path, 'modules')):
 else:
     sys.path.insert(0, os.path.join(app_path, '..'))
 
-from modules.system_setup import initialize_environment 
+from modules.system_setup import initialize_environment
 system_config = initialize_environment()
 
 # Ensure system locale is detected and set to UTF-8 before any GUI/WebEngine initialization
@@ -88,11 +88,11 @@ class RenameTabBar(QTabBar):
     def start_editing(self):
         rect = self.tabRect(self.edit_index)
         self.editor.setFixedSize(rect.size())
-        
+
         # Map local coordinates to global ones so the popup appears exactly over the tab
         global_pos = self.mapToGlobal(rect.topLeft())
         self.editor.move(global_pos)
-        
+
         self.editor.setText(self.tabText(self.edit_index))
         self.editor.show()
         self.editor.selectAll()
@@ -107,7 +107,7 @@ class RenameTabBar(QTabBar):
 class MainWindow(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
-        
+
         self.app_icon = get_app_icon()
         self.setWindowIcon(self.app_icon)
 
@@ -146,7 +146,7 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(self.tabs)
         self.setup_system_tray()
-        
+
         self.load_sessions_on_startup()
         self.tabs.repaint()
 
@@ -211,13 +211,13 @@ class MainWindow(QMainWindow):
         autostart_dir = os.path.join(os.path.expanduser('~'), '.config', 'autostart')
         autostart_path = os.path.join(autostart_dir, 'wams.desktop')
         is_autostart = os.path.exists(autostart_path)
-        
+
         autostart_action.setChecked(is_autostart)
-        
+
         # Ensure config setting matches reality
         if is_autostart != self.settings.value("general/autostart", False, bool):
             self.settings.setValue("general/autostart", is_autostart)
-            
+
         autostart_action.triggered.connect(self.toggle_autostart)
         menu.addAction(autostart_action)
 
@@ -398,7 +398,7 @@ class MainWindow(QMainWindow):
                 i += 1
             if name is None:
                 name = tr("Session {}").format(i)
-        
+
         # Ensure we have an initial name if loading existing
         if name is None:
             name = folder_id
@@ -437,7 +437,7 @@ class MainWindow(QMainWindow):
             # This ensures page is destroyed with webview
             page = web.WhatsApp(profile, webview)
             webview.setPage(page)
-            
+
             # Make the profile a child of the page so it lives as long as the page
             # and is destroyed AFTER the page is gone/stopped.
             profile.setParent(page)
@@ -492,13 +492,13 @@ class MainWindow(QMainWindow):
             # We ONLY update the alias in settings and the UI
             # No folder moves = No Segfault
             folder_id = current_webview.folder_id
-            
+
             self.settings.setValue(f"aliases/{folder_id}", new_name)
             self.settings.sync()
-            
+
             current_webview.session_name = new_name
             self.tabs.setTabText(index, new_name)
-            
+
             print(f"Renamed alias: '{old_name}' -> '{new_name}' (ID: {folder_id})")
 
         except Exception as e:
@@ -528,13 +528,13 @@ class MainWindow(QMainWindow):
         # Safety check for index and double calls
         if index < 0 or index >= self.tabs.count():
             return
-            
+
         if hasattr(self, "_closing_tab_lock") and self._closing_tab_lock:
             return
-            
+
         tab_name = self.tabs.tabText(index)
         is_last_tab = self.tabs.count() <= 1
-        
+
         reply = QMessageBox.question(
             self,
             tr('Confirm Close'),
@@ -567,7 +567,7 @@ class MainWindow(QMainWindow):
                     # Stop its internal timers if any
                     current_webview.page().runJavaScript("window.stop();")
                     current_webview.page().deleteLater()
-                
+
                 # 3. Remove tab (destroys the webview container)
                 self.tabs.removeTab(index)
                 current_webview.deleteLater()
@@ -583,12 +583,12 @@ class MainWindow(QMainWindow):
                 # 4. Immediate Rename + Delayed Physical deletion
                 # Renaming prevents the session from being loaded if the app restarts before deletion
                 temp_deleted_path = session_path + ".deleted"
-                
+
                 def final_cleanup():
                     # Check if program is still running
                     if not QApplication.instance() or not QApplication.instance().activeWindow():
                         return
-                        
+
                     if os.path.exists(temp_deleted_path):
                         shutil.rmtree(temp_deleted_path, ignore_errors=True)
                         print(f"Permanently deleted session data: {temp_deleted_path}")
@@ -602,7 +602,7 @@ class MainWindow(QMainWindow):
                     print(f"Could not rename session folder immediately: {e}")
                     # If rename fails (rare on Linux), we'll try to delete the original path directly
                     temp_deleted_path = session_path
-                
+
                 QTimer.singleShot(3000, final_cleanup)
 
             except Exception as e:
@@ -708,20 +708,20 @@ class MainWindow(QMainWindow):
     def quit_application(self):
         """Saves settings and shuts down everything cleanly."""
         self.force_quit = True
-        
+
         # 1. Stop app-level timers to avoid accessing dying objects
         if hasattr(self, 'keep_alive_timer'):
             self.keep_alive_timer.stop()
-            
+
         print("Stopping application timers...")
-            
+
         # 2. Hide UI components
         if hasattr(self, 'tray_icon'):
             self.tray_icon.hide()
-            
+
         # 3. Save state
         self.save_window_settings()
-        
+
         # 4. Quit - Qt will handle the destruction of the widget tree
         print("Application shutting down...")
         QApplication.instance().quit()
@@ -966,14 +966,14 @@ def _route_external_link(window: 'MainWindow', raw_link: str):
             window.show_window()  # Bring the main window to front
 
 
-if __name__ == "__main__":
+def main():
     app = QApplication(sys.argv)
-    
+
     # Set app names to prevent "main.py" or "python" from showing up in Wayland taskbars
     app.setApplicationName("WAms")
     app.setApplicationDisplayName("WhatsApp MultiSession")
     app.setDesktopFileName("wams.desktop")
-    
+
     app.setQuitOnLastWindowClosed(False)
 
     system_locale = QLocale.system()
@@ -994,3 +994,7 @@ if __name__ == "__main__":
             QTimer.singleShot(300, lambda: _route_external_link(window, link))
 
     sys.exit(app.exec())
+
+
+if __name__ == "__main__":
+    main()

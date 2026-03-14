@@ -1,6 +1,6 @@
 # WhatsApp MultiSession (WAms)
 
-A native PyQt6 application for Linux that allows managing multiple WhatsApp Web sessions simultaneously and independently. 
+A native PyQt6 application for Linux that allows managing multiple WhatsApp Web sessions simultaneously and independently.
 
 WAms seamlessly integrates with your desktop environment, providing a clean, tabbed interface to manage personal, work, and other WhatsApp accounts without mixing their data or relying on separate browser profiles. It also acts as a native protocol handler, directly intercepting "wa.me" and "whatsapp://" links from outside the app.
 
@@ -33,43 +33,60 @@ Designed specifically with modern Linux environments in mind.
 
 ## 🚀 Installation
 
+## 📦 Requirements
+
+Designed specifically with modern Linux environments in mind.
+
+* Python 3.10+
+* PyQt6 (`python-pyqt6`)
+* PyQt6 WebEngine (`python-pyqt6-webengine`)
+* Python D-Bus (`python-dbus`)
+* System utilities: `pciutils`, `mesa-utils`, `xdg-user-dirs`
+
+*(Note: Hardware acceleration is optimized for Nvidia GPUs, e.g., GTX 1080 with proprietary drivers and CUDA).*
+
+## 🚀 Installation
+
 ### Arch Linux (Recommended)
 
 The easiest way to install WAms on Arch Linux or Arch-based distributions (Manjaro, EndeavourOS) is using the included `PKGBUILD`.
-
-1. Clone the repository:
 ```bash
-git clone https://github.com/jhandervelbux/wams.git
-cd wams
-```
-
-2. Build and install the package using `makepkg`:
-```bash
+git clone https://github.com/JhonAndersonVelasco/WAms.git
+cd WAms
 makepkg -si
 ```
-This will automatically resolve dependencies, build the package, install the desktop entry, and update your system's MIME database so WAms can immediately start handling `whatsapp://` links.
 
-### Manual Execution (Other Distributions)
+This will automatically resolve dependencies, install the desktop entry, and register WAms as the handler for `whatsapp://` and `wa.me` links.
 
-If you are not on Arch Linux, you can run the application directly from source:
+### Other Linux Distributions (pip)
 
-1. Install the required dependencies using your package manager or `pip`:
+For any other distribution, first install the system-level dependencies, then install WAms via `pip`:
+
+**Ubuntu / Debian:**
 ```bash
-# Ubuntu/Debian
-sudo apt install python3-pyqt6 python3-pyqt6.qtwebengine python3-dbus python3-dbus.mainloop.glib pciutils mesa-utils xdg-user-dirs
+sudo apt install python3-pyqt6 python3-pyqt6.qtwebengine python3-dbus pciutils mesa-utils xdg-user-dirs
+pip install . --break-system-packages
+```
 
-# Fedora
-sudo dnf install python3-qt6 python3-qt6-webengine python3-dbus pciutils mesa-libGL-devel xdg-user-dirs
+**Fedora:**
+```bash
+sudo dnf install python3-pyqt6 python3-pyqt6-webengine python3-dbus pciutils mesa-libGL xdg-user-dirs
+pip install .
+```
 
-# Or via pip (ensure system dependencies for PyQt6 are met)
+**Other distros:**
+```bash
+# Install PyQt6 and dbus-python via pip if not available in your package manager
 pip install PyQt6 PyQt6-WebEngine dbus-python
+pip install .
 ```
 
-2. Run the application:
+After installation, run the app with:
 ```bash
-cd wams/main
-python main.py
+wams
 ```
+
+> **Note:** `dbus-python` may require system development headers (`libdbus-1-dev` on Debian/Ubuntu, `dbus-devel` on Fedora) if installed via pip.
 
 ## 💻 Usage
 

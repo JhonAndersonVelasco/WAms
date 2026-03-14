@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "wams"
+version = "1.0.0"
+description = "A native PyQt6 application for Linux that allows managing multiple WhatsApp Web sessions simultaneously and independently."
+readme = "README.md"
+license = { text = "GPL-3.0" }
+authors = [{ name = "Jhon Velasco", email = "jhandervelbux@gmail.com" }]
+requires-python = ">=3.10"
+keywords = ["whatsapp", "multisession", "pyqt6", "linux", "messaging"]
+classifiers = [
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: Python :: 3",
+    "Operating System :: POSIX :: Linux",
+    "Environment :: X11 Applications :: Qt",
+]
+dependencies = [
+    "PyQt6",
+    "PyQt6-WebEngine",
+    "dbus-python",
+]
+
+[project.urls]
+Homepage = "https://github.com/JhonAndersonVelasco/WAms"
+Repository = "https://github.com/JhonAndersonVelasco/WAms"
+"Bug Tracker" = "https://github.com/JhonAndersonVelasco/WAms/issues"
+
+[project.scripts]
+wams = "main.main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["main*"]
+exclude = ["pkg*"]
+
+[tool.setuptools.package-data]
+"main.modules" = ["translations/*.json", "wams.png"]
+"main" = ["wams.desktop"]
