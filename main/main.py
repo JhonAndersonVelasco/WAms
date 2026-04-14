@@ -269,26 +269,39 @@ class MainWindow(QMainWindow):
         información de la aplicación, donaciones y configuración de autostart.
         """
         menu = QMenu(self)
+        menu.setToolTipsVisible(True)
 
         # Quick guide
         quick_guide_action = QAction(tr("📖 Quick guide"), self)
+        quick_guide_action.setToolTip(tr("Show the quick interaction guide for the application"))
         quick_guide_action.triggered.connect(self.show_quick_guide)
         menu.addAction(quick_guide_action)
 
         # About
         about_action = QAction(tr("ℹ️ About"), self)
+        about_action.setToolTip(tr("Show information about WhatsApp MultiSession"))
         about_action.triggered.connect(self.show_about)
         menu.addAction(about_action)
 
         # Donate
         donate_action = QAction(tr("💝 Donate"), self)
+        donate_action.setToolTip(tr("Support the developer with a donation"))
         donate_action.triggered.connect(self.show_donate)
         menu.addAction(donate_action)
 
         menu.addSeparator()
 
+        # External Links Behavior
+        ask_link_action = QAction(tr("🔗 Ask before opening link"), self)
+        ask_link_action.setToolTip(tr("If enabled, asks which session to use when clicking external WhatsApp links. If disabled, opens in the active tab."))
+        ask_link_action.setCheckable(True)
+        ask_link_action.setChecked(self.settings.value("general/ask_before_link", False, bool))
+        ask_link_action.triggered.connect(self.toggle_ask_before_link)
+        menu.addAction(ask_link_action)
+
         # Autostart
-        autostart_action = QAction(tr("Autostart"), self)
+        autostart_action = QAction(tr("🚀 Autostart"), self)
+        autostart_action.setToolTip(tr("Launch the application automatically when you log in"))
         autostart_action.setCheckable(True)
         # Check actual file existence for truth, rather than just config.ini
         autostart_dir = os.path.join(os.path.expanduser('~'), '.config', 'autostart')
@@ -763,21 +776,20 @@ class MainWindow(QMainWindow):
         """Configura la geometría y posición de la ventana desde los ajustes guardados.
         
         Lee las preferencias de tamaño y posición de la ventana desde config.ini,
-        aplica valores predeterminados si no existen, y muestra la ventana maximizada
-        si así se configuró previamente.
+        aplica valores predeterminados si no existen.
         """
         default_width, default_height = DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT
         self.setMinimumSize(default_width, default_height)
+        
         width = self.settings.value("window/width", default_width, int)
         height = self.settings.value("window/height", default_height, int)
         pos_x = self.settings.value("window/pos_x", 100, int)
         pos_y = self.settings.value("window/pos_y", 100, int)
-        is_maximized = self.settings.value("window/maximized", False, bool)
+        
         self.resize(max(width, default_width), max(height, default_height))
         self.move(pos_x, pos_y)
-        # Mostrar la ventana se difiere hasta después de la inicialización completa en __main__
-        self.save_window_settings()
-        print(f"Window geometry configured: {width}x{height} at ({pos_x}, {pos_y})")
+            
+        print("Window geometry restored.")
 
     def setup_system_locale(self):
         """Imprime información sobre el locale actual del sistema.
@@ -881,14 +893,15 @@ class MainWindow(QMainWindow):
     def save_window_settings(self):
         """Guarda la configuración de geometría de la ventana en settings.
         
-        Almacena el tamaño y posición de la ventana, pero solo si no está
-        maximizada (para preservar las dimensiones reales de la ventana).
+        Guarda la posición y el tamaño solo si la ventana no está maximizada,
+        evitando así sobreescribir el tamaño 'restaurado' pequeño.
         """
         if not self.isMaximized():
             self.settings.setValue("window/width", self.width())
             self.settings.setValue("window/height", self.height())
             self.settings.setValue("window/pos_x", self.x())
             self.settings.setValue("window/pos_y", self.y())
+            
         self.settings.setValue("window/maximized", self.isMaximized())
         self.settings.sync()
         print("Window settings saved.")
@@ -897,7 +910,8 @@ class MainWindow(QMainWindow):
         """Maneja la descarga de archivos desde WhatsApp Web.
         
         Muestra un diálogo de guardado de archivos nativo para que el usuario
-        elija dónde guardar el archivo descargado.
+        elija dónde guardar el archivo descargado. Al finalizar, pregunta si
+        desea abrirlo.
         
         Args:
             download (QWebEngineDownloadRequest): Solicitud de descarga.
@@ -912,6 +926,24 @@ class MainWindow(QMainWindow):
                 download.setDownloadDirectory(os.path.dirname(path))
                 download.setDownloadFileName(os.path.basename(path))
                 download.url().setPath(path)
+                
+                def on_state_changed(state):
+                    if state == QWebEngineDownloadRequest.DownloadState.DownloadCompleted:
+                        reply = QMessageBox.question(
+                            self,
+                            tr("Download completed"),
+                            tr("The file '{}' has been downloaded.\nDo you want to open it?").format(os.path.basename(path)),
+                            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                            QMessageBox.StandardButton.Yes
+                        )
+                        if reply == QMessageBox.StandardButton.Yes:
+                            import subprocess
+                            try:
+                                subprocess.Popen(["xdg-open", path])
+                            except Exception as e:
+                                print(f"Error opening downloaded file: {e}")
+
+                download.stateChanged.connect(on_state_changed)
                 download.accept()
 
     def show_notification(self, notification, source_webview):
@@ -1014,31 +1046,12 @@ class MainWindow(QMainWindow):
         else:
             self.quit_application()
 
-    def resizeEvent(self, event):
-        """Maneja el evento de redimensionamiento de ventana.
-        
-        Guarda las nuevas dimensiones de la ventana si no está maximizada.
-        
-        Args:
-            event: Evento de redimensionamiento.
-        """
-        super().resizeEvent(event)
-        if not self.isMaximized():
-            self.settings.setValue("window/width", self.width())
-            self.settings.setValue("window/height", self.height())
 
-    def moveEvent(self, event):
-        """Maneja el evento de movimiento de ventana.
-        
-        Guarda la nueva posición de la ventana si no está maximizada.
-        
-        Args:
-            event: Evento de movimiento.
-        """
-        super().moveEvent(event)
-        if not self.isMaximized():
-            self.settings.setValue("window/pos_x", self.x())
-            self.settings.setValue("window/pos_y", self.y())
+
+    def toggle_ask_before_link(self, state):
+        """Habilita o deshabilita la confirmación antes de abrir un enlace externo."""
+        self.settings.setValue("general/ask_before_link", state)
+        self.settings.sync()
 
     def toggle_autostart(self, state):
         """Habilita o deshabilita el inicio automático de la aplicación al iniciar sesión.
@@ -1128,12 +1141,59 @@ class MainWindow(QMainWindow):
             return
             
         target_index = self.tabs.currentIndex()
+        
+        ask_link = self.settings.value("general/ask_before_link", False, bool)
+        if ask_link and self.tabs.count() > 1:
+            dialog = SessionSelectorDialog(self.tabs, self)
+            if dialog.exec() == QDialog.DialogCode.Accepted:
+                target_index = dialog.selected_index
+            else:
+                return
+                
         if target_index >= 0:
+            self.tabs.setCurrentIndex(target_index)
             webview = self.tabs.widget(target_index)
             if webview:
                 webview.load(QUrl(web_url))
 
 
+
+class SessionSelectorDialog(QDialog):
+    """Diálogo que permite al usuario elegir qué sesión debe manejar un enlace externo."""
+
+    def __init__(self, tabs: QTabWidget, parent=None):
+        super().__init__(parent)
+        self.selected_index = -1
+
+        self.setWindowTitle(tr("Open link in…"))
+        self.setWindowFlags(Qt.WindowType.Dialog | Qt.WindowType.WindowCloseButtonHint)
+        self.setModal(True)
+        self.setMinimumWidth(320)
+
+        layout = QVBoxLayout(self)
+        layout.setSpacing(10)
+        layout.setContentsMargins(20, 20, 20, 20)
+
+        label = QLabel(tr("Which session should open this link?"))
+        label.setWordWrap(True)
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(label)
+
+        for i in range(tabs.count()):
+            alias = tabs.tabText(i)
+            btn = QPushButton(alias)
+            btn.setMinimumHeight(36)
+            btn.clicked.connect(lambda checked, idx=i: self._select(idx))
+            layout.addWidget(btn)
+
+        cancel_btn = QPushButton(tr("Cancel"))
+        cancel_btn.setMinimumHeight(36)
+        cancel_btn.clicked.connect(self.reject)
+        layout.addWidget(cancel_btn)
+
+    def _select(self, index: int):
+        self.selected_index = index
+        self.accept()
 
 def main():
     """Función principal de entrada de la aplicación.
