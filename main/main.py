@@ -9,6 +9,9 @@ import sys
 import time
 import webbrowser
 
+# Reducir el ruido de logs de Chromium en la terminal
+os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--log-level=3"
+
 # Constantes de la aplicación
 APP_DATA_DIR = os.path.join(os.path.expanduser("~"), ".WAms")
 """Directorio de datos de la aplicación (~/.WAms)"""
@@ -152,6 +155,7 @@ class DBusHandler(QObject):
 
     @pyqtSlot(str)
     def handle_url(self, url):
+        print(f"[*] D-Bus handle_url invocado con URL externa: {url}")
         self.url_received.emit(url)
 
 class MainWindow(QMainWindow):
@@ -1105,6 +1109,7 @@ class MainWindow(QMainWindow):
 
     def process_url(self, url):
         """Procesa una URL entrante y la carga en la sesión activa."""
+        print(f"[*] Ventana principal procesando URL: {url}")
         self.show_window()
         
         if not url:

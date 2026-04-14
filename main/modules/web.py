@@ -59,6 +59,11 @@ class WhatsApp(QWebEnginePage):
         self.keep_alive_timer.timeout.connect(self.keep_connection_alive)
         self.keep_alive_timer.start(WEB_KEEP_ALIVE_INTERVAL)  # 45 segundos
 
+    def javaScriptConsoleMessage(self, level, message, lineNumber, sourceID):
+        """Sobrescribe la salida de consola JS para ocultar ruido de telemetría y web."""
+        # Se suprimen todos los mensajes de error irrelevantes de WhatsApp Web
+        pass
+
     def cleanup(self):
         """Asegura que los filtros de eventos globales se eliminen.
         
