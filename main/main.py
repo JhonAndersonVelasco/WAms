@@ -1166,7 +1166,7 @@ def main():
         sys.exit(0)
         
     dbus_handler = DBusHandler()
-    dbus_conn.registerObject("/", dbus_handler, QDBusConnection.RegisterOption.ExportScriptableSlots)
+    dbus_conn.registerObject("/", dbus_handler, QDBusConnection.RegisterOption.ExportAllSlots)
 
     window = MainWindow()
     window.setWindowTitle("WhatsApp MultiSession")
